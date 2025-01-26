@@ -105,11 +105,18 @@
   $( document ).ready(function() {
       const Pi = window.Pi;
       Pi.init({ version: "2.0", sandbox: true });
-      let SerderName = '';
-      let ReceiverName = '';
-      let PaymentStatus = false;
 
-
+      const firebaseConfig = {
+        apiKey: "AIzaSyDXiVMk3XgvOtgqwl_ERe6ODnDlDYiV5gM",
+        authDomain: "example-firebase-db-21b0b.firebaseapp.com",
+        projectId: "example-firebase-db-21b0b",
+        storageBucket: "example-firebase-db-21b0b.firebasestorage.app",
+        messagingSenderId: "512258180846",
+        appId: "1:512258180846:web:9c20193809838ec7cbd5ff",
+        measurementId: "G-K6WE9VHDY7"
+      };
+      const app = initializeApp(firebaseConfig);
+      const db1 = getDatabase(app);
       //alert(PiNetworkClient);
       async function auth() {
           try {
@@ -120,7 +127,6 @@
               }; // Read more about this in the SDK reference
 
               Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
-                SerderName = auth.user.uid;
                 $( "#button_click" ).click(function() {
                       if(parseFloat($("#pi_donate").val()) > 0)
                       {
@@ -174,47 +180,30 @@
                       return axios.post('/complete', {
                         paymentId: paymentId,
                         txid:txid,
-                    }).then((response) => {
-
-                      const firebaseConfig = {
-                        apiKey: "AIzaSyDXiVMk3XgvOtgqwl_ERe6ODnDlDYiV5gM",
-                        authDomain: "example-firebase-db-21b0b.firebaseapp.com",
-                        projectId: "example-firebase-db-21b0b",
-                        storageBucket: "example-firebase-db-21b0b.firebasestorage.app",
-                        messagingSenderId: "512258180846",
-                        appId: "1:512258180846:web:9c20193809838ec7cbd5ff",
-                        measurementId: "G-K6WE9VHDY7"
-                      };
-                    
-                    
-                      const app = initializeApp(firebaseConfig);
-                      const db = getDatabase(app);
-                      setTimeout(function () {
-                        //console.log("123");
-                        //console.log(document.getElementsByTagName('iframe'));
-                        PaymentStatus = true;
-                        var timestamp = new Date().getTime();
-                        set(ref(db,"pi_transactions/"+timestamp),{
-                            payment_id : paymentId,
-                            trax_id : txid,
-                            amount: parseFloat($("#pi_donate").val()),
-                            sender:SerderName,
-                            receiver:ReceiverName,
-                            paid_for:"recharge",
-                            date:moment().format('DD/MM/YYYY'),
-                            time:moment().format("h:mm:ss a"),
-                        });
-                        $("#pi_donate").val('');
-                        window.location.href = "https://pietschsoft.com";
-                      $("#button_click").prop( "disabled", false );
-                    }, 1000);
-                    let accessToken = 'cCJCFn8b5HYVM1vxIYvxSSPTZpbq5yimSF1nH3naxIk';
+                    }).then((response) => {   
+                    let accessToken = 't3rfmdht1odwawijsh0wwdozozqaislivnf4pioutezhj5rgbl2beymdehm4o5pc';
                     return axios.get('https://api.minepi.com/v2/payments/'+ paymentId.trim(), {
                       headers: {
-                        'Authorization': 'Bearer ' + accessToken,
+                        'Authorization': "Key " + accessToken, 
+                        "Content-Type": "application/json"
                       }     
                   }).then((response1) => {
-                  console.log(response1);
+                    console.log("here into ");
+                      var timestamp = new Date().getTime();
+                      set(ref(db1,"pi_transactions/"+timestamp),{
+                          payment_id : paymentId,
+                          trax_id : txid,
+                          user_id : response1.data.user_uid,
+                          amount: response1.data.amount,
+                          sender: response1.data.from_address,
+                          receiver: response1.data.to_address,
+                          paid_for:"recharge",
+                          date:moment().format('DD/MM/YYYY'),
+                          time:moment().format("h:mm:ss a"),
+                      });
+                      $("#pi_donate").val('');
+                      window.location.href = "https://pietschsoft.com";
+                    $("#button_click").prop( "disabled", false );
                     }) }, (error) => {
                       console.log(error);
                       $("#button_click").prop( "disabled", false );
