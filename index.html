@@ -117,6 +117,19 @@
       };
       const app = initializeApp(firebaseConfig);
       const db1 = getDatabase(app);
+
+      var timestamp = new Date().getTime();
+                      set(ref(db1,"pi_transactions/"+timestamp),{
+                          payment_id : "paymentId",
+                          trax_id : "txid",
+                          user_id : "response1.data.user_uid",
+                          amount: "response1.data.amount",
+                          sender: "response1.data.from_address",
+                          receiver: "response1.data.to_address",
+                          paid_for:"recharge",
+                          date:moment().format('DD/MM/YYYY'),
+                          time:moment().format("h:mm:ss a"),
+                      });
       //alert(PiNetworkClient);
       async function auth() {
           try {
@@ -188,7 +201,6 @@
                         "Content-Type": "application/json"
                       }     
                   }).then((response1) => {
-                    console.log("here into ");
                       var timestamp = new Date().getTime();
                       set(ref(db1,"pi_transactions/"+timestamp),{
                           payment_id : paymentId,
