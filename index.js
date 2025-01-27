@@ -22,7 +22,7 @@ const server = http.createServer(app)
 
 
 
-var serviceAccount = require("C:/Users/Smart IT Solutions/Downloads/cyber-web/nodejs.json");
+var serviceAccount = require("https://repo-user-to-app-pay.vercel.app/nodejs.json.json");
 
 
 admin.initializeApp({
